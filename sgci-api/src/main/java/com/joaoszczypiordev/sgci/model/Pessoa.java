@@ -3,6 +3,7 @@ package com.joaoszczypiordev.sgci.model;
 
 import com.joaoszczypiordev.sgci.enums.EstadoCivil;
 import com.joaoszczypiordev.sgci.enums.TipoPessoa;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
