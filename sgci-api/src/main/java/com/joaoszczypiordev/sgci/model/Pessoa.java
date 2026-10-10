@@ -51,7 +51,7 @@ public class Pessoa {
     private EstadoCivil estadoCivil;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_endereco", nullable = false)
     private Endereco endereco;
 

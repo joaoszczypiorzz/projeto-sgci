@@ -45,4 +45,12 @@ public class PessoaService {
 
         return pessoaRepository.save(pessoa).getId();
     }
+
+    @Transactional
+    public void deletePessoa(Long id) {
+        Pessoa pessoa = pessoaRepository.findById(id)
+                .orElseThrow();
+
+        pessoaRepository.delete(pessoa);
+    }
 }
