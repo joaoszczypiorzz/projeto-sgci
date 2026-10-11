@@ -6,6 +6,7 @@ import com.joaoszczypiordev.sgci.dtos.endereco.EnderecoResponse;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaMapper;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaResponse;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaSaveDto;
+import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaUpd;
 import com.joaoszczypiordev.sgci.infra.exceptions.InvalidInputException;
 import com.joaoszczypiordev.sgci.model.Endereco;
 import com.joaoszczypiordev.sgci.model.Pessoa;
@@ -54,11 +55,42 @@ public class PessoaService {
     }
 
     @Transactional
+    public Long updatePessoa(Long id, PessoaUpd pessoaUpd) {
+        Pessoa pessoa = pessoaRepository.findById(id)
+                .orElseThrow();
+
+        // Atualizando dados basicos da Pessoa:
+        pessoa.setDocumento(pessoaUpd.documento());
+        pessoa.setEstadoCivil(pessoaUpd.estadoCivil());
+        pessoa.setNome(pessoaUpd.nome());
+        pessoa.setProfissao(pessoaUpd.profissao());
+        pessoa.setTipoPessoa(pessoaUpd.tipoPessoa());
+
+        // Atualizando dados de endereço:
+        pessoa.getEndereco().setCep(pessoaUpd.endereco().cep());
+        pessoa.getEndereco().setEstado(pessoaUpd.endereco().estado());
+        pessoa.getEndereco().setCidade(pessoaUpd.endereco().cidade());
+        pessoa.getEndereco().setRua(pessoaUpd.endereco().rua());
+        pessoa.getEndereco().setBairro(pessoaUpd.endereco().bairro());
+        pessoa.getEndereco().setNumero(pessoaUpd.endereco().numero());
+
+        return pessoaRepository.save(pessoa).getId();
+    }
+
+    @Transactional
     public void deletePessoa(Long id) {
         Pessoa pessoa = pessoaRepository.findById(id)
                 .orElseThrow();
 
         pessoaRepository.delete(pessoa);
+    }
+
+    public PessoaResponse findById (Long id) {
+        Pessoa pessoa = pessoaRepository.findById(id)
+                .orElseThrow();
+
+        EnderecoResponse enderecoResponse = EnderecoMapper.INSTANCE.toEnderecoResponse(pessoa.getEndereco());
+        return PessoaMapper.INSTANCE.toPessoaResponse(pessoa, enderecoResponse);
     }
 
 
