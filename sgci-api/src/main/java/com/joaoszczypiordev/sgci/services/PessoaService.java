@@ -100,6 +100,13 @@ public class PessoaService {
         return PessoaMapper.INSTANCE.toPessoaResponse(pessoa, enderecoResponse);
     }
 
+    /**
+     * Função que realiza Paginação dos dados, utilizando objeto Padrão {@link org.springframework.data.domain.Pageable} do SpringBoot
+     * Assim como também realiza filtros dinamicos nos dados Utilizando os padrões de {@link Specification} do Framework
+     * @param filtros Objeto contento os filtros para Classe Pessoa e filtros para o Pageable
+     * @return Retorna uma Classe padronizada de response
+     * @Author João Szczypior
+     */
     public ResponsePagedCommom<PessoaResponse> findAll(PessoaFilter filtros) {
 
         // Filtros dinamicos:
