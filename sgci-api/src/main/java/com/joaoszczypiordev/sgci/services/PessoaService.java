@@ -85,6 +85,14 @@ public class PessoaService {
         pessoaRepository.delete(pessoa);
     }
 
+    public PessoaResponse findById (Long id) {
+        Pessoa pessoa = pessoaRepository.findById(id)
+                .orElseThrow();
+
+        EnderecoResponse enderecoResponse = EnderecoMapper.INSTANCE.toEnderecoResponse(pessoa.getEndereco());
+        return PessoaMapper.INSTANCE.toPessoaResponse(pessoa, enderecoResponse);
+    }
+
 
     public List<PessoaResponse> findAll() {
         List<Pessoa> listPessoaBd = pessoaRepository.findAll();
