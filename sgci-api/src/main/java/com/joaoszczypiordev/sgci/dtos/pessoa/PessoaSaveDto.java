@@ -17,5 +17,6 @@ public record PessoaSaveDto(
    String profissao,
    @NotNull(message = "É obrigatório informar o estado civil.")
    EstadoCivil estadoCivil,
+   @NotNull(message = "As informações de Endereço precisam ser informadas")
    EnderecoSaveDto endereco
 ) {}
