@@ -1,6 +1,10 @@
 package com.joaoszczypiordev.sgci.services;
 
 
+import com.joaoszczypiordev.sgci.dtos.endereco.EnderecoMapper;
+import com.joaoszczypiordev.sgci.dtos.endereco.EnderecoResponse;
+import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaMapper;
+import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaResponse;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaSaveDto;
 import com.joaoszczypiordev.sgci.infra.exceptions.InvalidInputException;
 import com.joaoszczypiordev.sgci.model.Endereco;
@@ -9,6 +13,9 @@ import com.joaoszczypiordev.sgci.repository.PessoaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,5 +51,27 @@ public class PessoaService {
         );
 
         return pessoaRepository.save(pessoa).getId();
+    }
+
+    @Transactional
+    public void deletePessoa(Long id) {
+        Pessoa pessoa = pessoaRepository.findById(id)
+                .orElseThrow();
+
+        pessoaRepository.delete(pessoa);
+    }
+
+
+    public List<PessoaResponse> findAll() {
+        List<Pessoa> listPessoaBd = pessoaRepository.findAll();
+        List<PessoaResponse> listResponse = new ArrayList<>();
+
+        listPessoaBd.forEach(pessoa -> {
+            EnderecoResponse enderecoResponse = EnderecoMapper.INSTANCE.toEnderecoResponse(pessoa.getEndereco());
+            PessoaResponse pessoaResponse = PessoaMapper.INSTANCE.toPessoaResponse(pessoa, enderecoResponse);
+            listResponse.add(pessoaResponse);
+        });
+
+        return listResponse;
     }
 }
