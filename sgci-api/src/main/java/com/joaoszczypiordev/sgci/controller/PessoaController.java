@@ -1,5 +1,7 @@
 package com.joaoszczypiordev.sgci.controller;
 
+import com.joaoszczypiordev.sgci.dtos.pageable.ResponsePagedCommom;
+import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaFilter;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaResponse;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaSaveDto;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaUpd;
@@ -51,8 +53,8 @@ public class PessoaController {
 
 
     @GetMapping
-    public ResponseEntity<List<PessoaResponse>> findAll () {
-        return ResponseEntity.ok(pessoaService.findAll());
+    public ResponseEntity<ResponsePagedCommom<PessoaResponse>> findAll (@Valid PessoaFilter filtros) {
+        return ResponseEntity.ok(pessoaService.findAll(filtros));
     }
 
 }

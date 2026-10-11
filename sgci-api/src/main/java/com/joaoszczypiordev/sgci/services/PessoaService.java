@@ -3,6 +3,8 @@ package com.joaoszczypiordev.sgci.services;
 
 import com.joaoszczypiordev.sgci.dtos.endereco.EnderecoMapper;
 import com.joaoszczypiordev.sgci.dtos.endereco.EnderecoResponse;
+import com.joaoszczypiordev.sgci.dtos.pageable.ResponsePagedCommom;
+import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaFilter;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaMapper;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaResponse;
 import com.joaoszczypiordev.sgci.dtos.pessoa.PessoaSaveDto;
@@ -11,7 +13,12 @@ import com.joaoszczypiordev.sgci.infra.exceptions.InvalidInputException;
 import com.joaoszczypiordev.sgci.model.Endereco;
 import com.joaoszczypiordev.sgci.model.Pessoa;
 import com.joaoszczypiordev.sgci.repository.PessoaRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,9 +100,40 @@ public class PessoaService {
         return PessoaMapper.INSTANCE.toPessoaResponse(pessoa, enderecoResponse);
     }
 
+    public ResponsePagedCommom<PessoaResponse> findAll(PessoaFilter filtros) {
 
-    public List<PessoaResponse> findAll() {
-        List<Pessoa> listPessoaBd = pessoaRepository.findAll();
+        // Filtros dinamicos:
+        Specification<Pessoa> CustomFilters = (root, query, cb) -> {
+            List<Predicate> condicoes = new ArrayList<>();
+
+            if (filtros.getNome() != null) {
+                condicoes.add(cb.like(root.get("nome"), "%" + filtros.getNome() + "%"));
+            }
+
+            if(filtros.getDocumento() != null) {
+                condicoes.add(cb.equal(root.get("documento"), filtros.getDocumento()));
+            }
+
+            if(filtros.getCep() != null) {
+                condicoes.add(cb.equal(root.get("endereco").get("cep"), filtros.getCep()));
+            }
+
+            if(filtros.getCidade() != null) {
+                condicoes.add(cb.equal(root.get("endereco").get("cidade"), filtros.getCidade()));
+            }
+
+            if(filtros.getEstado() != null) {
+                condicoes.add(cb.equal(root.get("endereco").get("estado"), filtros.getEstado()));
+            }
+
+            if(filtros.getTipoPessoa() != null) {
+                condicoes.add(cb.equal(root.get("tipoPessoa"), filtros.getTipoPessoa()));
+            }
+
+            return cb.and(condicoes.toArray(Predicate[]::new));
+        };
+
+        Page<Pessoa> listPessoaBd = pessoaRepository.findAll(CustomFilters, PageRequest.of(filtros.getPage(), filtros.getSize(), Sort.by(filtros.getDirection(), filtros.getOrderBy())));
         List<PessoaResponse> listResponse = new ArrayList<>();
 
         listPessoaBd.forEach(pessoa -> {
@@ -104,6 +142,11 @@ public class PessoaService {
             listResponse.add(pessoaResponse);
         });
 
-        return listResponse;
+        return new ResponsePagedCommom<PessoaResponse>(
+                listResponse,
+                listPessoaBd.getTotalElements(),
+                listPessoaBd.getTotalPages(),
+                filtros.getSize()
+        );
     }
 }
