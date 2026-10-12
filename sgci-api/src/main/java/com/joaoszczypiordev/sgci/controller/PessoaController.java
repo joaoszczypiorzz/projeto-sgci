@@ -51,10 +51,13 @@ public class PessoaController {
         return ResponseEntity.ok(pessoaService.findById(idPessoa));
     }
 
-
     @GetMapping
     public ResponseEntity<ResponsePagedCommom<PessoaResponse>> findAll (@Valid PessoaFilter filtros) {
         return ResponseEntity.ok(pessoaService.findAll(filtros));
     }
 
+    @GetMapping("/exportar-csv")
+    public ResponseEntity<String> exportarCsv () {
+        return ResponseEntity.ok(pessoaService.exportarParaBase64());
+    }
 }

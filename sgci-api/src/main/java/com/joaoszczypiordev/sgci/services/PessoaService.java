@@ -13,6 +13,8 @@ import com.joaoszczypiordev.sgci.infra.exceptions.InvalidInputException;
 import com.joaoszczypiordev.sgci.model.Endereco;
 import com.joaoszczypiordev.sgci.model.Pessoa;
 import com.joaoszczypiordev.sgci.repository.PessoaRepository;
+import com.opencsv.CSVWriter;
+import com.opencsv.ICSVWriter;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +24,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -155,5 +162,43 @@ public class PessoaService {
                 listPessoaBd.getTotalPages(),
                 filtros.getSize()
         );
+    }
+
+    public String exportarParaBase64 () {
+        List<Pessoa> listPessoaBd = pessoaRepository.findAll();
+
+        try (
+        // Objeto para armazenar em memoria o arquivo
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // Objeto que possibilita conversão de dados para escrita no arquivo OUT
+        OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+
+        CSVWriter csvWriter = new CSVWriter(writer,
+                ICSVWriter.DEFAULT_SEPARATOR, // Separador de campos no CSV (por padrão, vírgula)
+                ICSVWriter.DEFAULT_QUOTE_CHARACTER, // Nenhum caractere de citação será usado
+                ICSVWriter.DEFAULT_ESCAPE_CHARACTER, // Caractere de escape padrão
+                ICSVWriter.DEFAULT_LINE_END);  // Final de Linha padrão (por exemplo, "\r\n")
+        ) {
+            // Definindo cabeçalho do arquivo
+            String[] header = {"Nome", "Documento", "Profissao", "Estado Civil"};
+            csvWriter.writeNext(header);
+
+            // Para cada pessoa encontrada escrever 1 linha no arquivo com suas informações
+            listPessoaBd.forEach(pessoa -> {
+                String[] data = {pessoa.getNome(), pessoa.getDocumento(), pessoa.getProfissao(), pessoa.getEstadoCivil().toString()};
+                csvWriter.writeNext(data);
+            });
+
+            // Garante que tudo será escrito na ordem definida pela sequencia do meu codigo
+            writer.flush();
+
+            // Retornando o arquivo de outPut base64 convertido para uma String
+            return Base64.getEncoder().encodeToString(outputStream.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException("Erro inesperado ao exportar arquivo para Base64", e);
+        }
+
+
     }
 }
