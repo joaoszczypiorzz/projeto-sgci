@@ -5,6 +5,7 @@ import com.joaoszczypiordev.sgci.enums.EstadoCivil;
 import com.joaoszczypiordev.sgci.enums.TipoPessoa;
 
 public record PessoaResponse(
+        Long id,
         String nome,
         TipoPessoa tipoPessoa,
         String documento,

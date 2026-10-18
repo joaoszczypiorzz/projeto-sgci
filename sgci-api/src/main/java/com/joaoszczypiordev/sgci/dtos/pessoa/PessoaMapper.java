@@ -12,5 +12,6 @@ public interface PessoaMapper {
 
 
     @Mapping(source = "enderecoResponse", target = "endereco")
+    @Mapping(source = "pessoa.id", target = "id")
     PessoaResponse toPessoaResponse(Pessoa pessoa, EnderecoResponse enderecoResponse);
 }
