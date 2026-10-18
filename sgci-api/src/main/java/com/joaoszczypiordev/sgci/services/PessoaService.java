@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -99,6 +98,7 @@ public class PessoaService {
         pessoaRepository.delete(pessoa);
     }
 
+    @Transactional(readOnly = true)
     public PessoaResponse findById (Long id) {
         Pessoa pessoa = pessoaRepository.findById(id)
                 .orElseThrow();
