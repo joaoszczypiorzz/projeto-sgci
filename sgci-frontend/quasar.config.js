@@ -40,7 +40,9 @@ export default defineConfig((/* ctx */) => {
         // browser: 'baseline-widely-available',
         // node: 'node22'
       },
-
+      env: {
+        clientPrefix: 'VITE_'
+      },
       // https://v2.quasar.dev/quasar-cli-vite/page-routing-with-vue-router#filename-based-routing
       // filenameBasedRouting: true,
 
@@ -49,7 +51,6 @@ export default defineConfig((/* ctx */) => {
 
       // publicPath: '/',
       // define: {},
-      // defineEnv: {}
       // ignorePublicFolder: true,
       // minify: false,
       // distDir
